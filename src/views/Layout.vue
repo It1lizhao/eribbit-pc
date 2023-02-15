@@ -1,23 +1,33 @@
 <template>
   <!-- 顶部通栏 -->
-  <nav>顶部通栏</nav>
+  <app-navbar />
   <!-- 头部组件 -->
-  <head>
-    头部组件
-  </head>
+  <AppHeader />
   <!-- 内容容器 -->
-  <div>
+  <div class="app-body">
     <!-- 二级路由 -->
     <router-view />
   </div>
   <!-- 底部组件 -->
-  <footer>底部组件</footer>
+  <AppFooter />
 </template>
 
 <script>
+import AppNavbar from '@/components/app-navbar.vue'
+import AppHeader from '@/components/app-header'
+import AppFooter from '@/components/app-footer'
 export default {
-  name: 'Layout'
+  name: 'Layout',
+  components: {
+    AppNavbar,
+    AppHeader,
+    AppFooter
+  }
 }
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.app-body {
+  min-height: 600px;
+}
+</style>
