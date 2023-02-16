@@ -1,6 +1,7 @@
 <template>
   <!-- 顶部通栏 -->
   <app-navbar />
+  <AppHeaderSticky />
   <!-- 头部组件 -->
   <AppHeader />
   <!-- 内容容器 -->
@@ -16,12 +17,20 @@
 import AppNavbar from '@/components/app-navbar.vue'
 import AppHeader from '@/components/app-header'
 import AppFooter from '@/components/app-footer'
+import AppHeaderSticky from '@/components/app-header-sticky.vue'
+import { useStore } from 'vuex'
 export default {
   name: 'Layout',
   components: {
     AppNavbar,
     AppHeader,
-    AppFooter
+    AppFooter,
+    AppHeaderSticky
+  },
+  setup() {
+    // 获取分类数据
+    const store = useStore()
+    store.dispatch('category/getList')
   }
 }
 </script>
