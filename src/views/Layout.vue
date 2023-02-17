@@ -1,12 +1,13 @@
 <template>
   <!-- 顶部通栏 -->
   <app-navbar />
+  <!-- 头部下拉显示 -->
   <AppHeaderSticky />
   <!-- 头部组件 -->
   <AppHeader />
   <!-- 内容容器 -->
   <div class="app-body">
-    <!-- 二级路由 -->
+    <!-- 二级路由，显示中间内容 -->
     <router-view />
   </div>
   <!-- 底部组件 -->

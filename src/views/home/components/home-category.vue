@@ -2,11 +2,17 @@
   <div class="home-category" @mouseleave="categoryId = null">
     <ul class="menu">
       <li :class="{ active: categoryId === item.id }" v-for="item in menuList" :key="item.id" @mouseenter="categoryId = item.id">
+        <!-- 一级分类名 -->
         <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
+        <!-- 二级分类名 -->
         <template v-if="item.children">
           <RouterLink v-for="sub in item.children" :key="sub.id" :to="`/category/sub/${sub.id}`">
             {{ sub.name }}
           </RouterLink>
+        </template>
+        <template v-else>
+          <XtxSkeleton width="60px" height="18px" style="margin-right: 5px" bg="rgba(255,255,255,0.2)" />
+          <XtxSkeleton width="50px" height="18px" bg="rgba(255,255,255,0.2)" />
         </template>
       </li>
     </ul>
@@ -220,6 +226,19 @@ export default {
   &:hover {
     .layer {
       display: block;
+    }
+  }
+
+  //   骨架闪亮动画
+  .xtx-skeleton {
+    animation: fade 1s linear infinite alternate;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0.2;
+    }
+    to {
+      opacity: 1;
     }
   }
 }
