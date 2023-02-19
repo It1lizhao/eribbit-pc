@@ -4,12 +4,19 @@
       <!-- 面包屑 -->
       <SubBread />
       <!-- 筛选区 -->
-      <SubFilter />
+      <SubFilter @filter-change="filterChange" />
       <!-- 结果区域 -->
       <div class="goods-list">
         <!-- 排序 -->
-        <SubSort />
+        <SubSort @sort-change="sortChange" />
         <!-- 列表 -->
+        <ul>
+          <li v-for="item in goodsList" :key="item.id">
+            <GoodsItem :goods="item" />
+          </li>
+        </ul>
+        <!-- 加载 -->
+        <XtxInfiniteLoading :loading="loading" :finished="finished" @infinite="getData" />
       </div>
     </div>
   </div>
@@ -19,9 +26,80 @@
 import SubBread from './components/sub-bread.vue'
 import SubSort from './components/sub-sort'
 import SubFilter from './sub-filter.vue'
+import GoodsItem from './components/goods-item'
+import { ref, watch } from 'vue'
+import { findSubCategoryGoods } from '@/api/category'
+import { useRoute } from 'vue-router'
 export default {
   name: 'SubCategory',
-  components: { SubBread, SubFilter, SubSort }
+  components: { SubBread, SubFilter, SubSort, GoodsItem },
+  setup() {
+    // 1. 基础布局
+    // 2. 无限加载组件
+    // 3. 动态加载数据且渲染
+    // 4. 任何筛选条件变化需要更新列表
+    const route = useRoute() // 用来获取当前页IDID
+
+    const loading = ref(false)
+    const finished = ref(false)
+    const goodsList = ref([]) // 列表商品数据
+    // 接口需要的查询参数
+    let reqParams = {
+      page: 1,
+      pageSize: 20
+    }
+    // 获取列表数据函数
+    const getData = () => {
+      loading.value = true
+      reqParams.categoryId = route.params.id
+      findSubCategoryGoods(reqParams).then(({ result }) => {
+        // 如果接口返回有数据
+        if (result.items.length) {
+          goodsList.value.push(...result.items)
+          reqParams.page++
+        } else {
+          // 加载完毕
+          finished.value = true
+        }
+        // 请求结束
+        loading.value = false
+      })
+    }
+
+    // 切换二级分类重新加载
+    watch(
+      () => route.params.id,
+      (newVal) => {
+        // 重置参数
+        if (newVal && route.path === '/category/sub/' + newVal) {
+          goodsList.value = []
+          reqParams = {
+            page: 1,
+            pageSize: 20
+          }
+          finished.value = false
+        }
+      }
+    )
+
+    // 1. 更改排序组件的筛选数据，重新请求
+    const sortChange = (sortParams) => {
+      finished.value = false
+      // 合并请求参数，保留之前参数
+      reqParams = { ...reqParams, ...sortParams }
+      reqParams.page = 1
+      goodsList.value = []
+    }
+    // 2. 更改筛选组件的筛选数据，重新请求
+    const filterChange = (filterParams) => {
+      finished.value = false
+      // 合并请求参数，保留之前参数
+      reqParams = { ...reqParams, ...filterParams }
+      reqParams.page = 1
+      goodsList.value = []
+    }
+    return { loading, finished, goodsList, getData, filterChange, sortChange }
+  }
 }
 </script>
 
@@ -30,5 +108,17 @@ export default {
   background: #fff;
   padding: 0 25px;
   margin-top: 25px;
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 5px;
+    li {
+      margin-right: 20px;
+      margin-bottom: 20px;
+      &:nth-child(5n) {
+        margin-right: 0;
+      }
+    }
+  }
 }
 </style>
